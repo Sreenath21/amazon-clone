@@ -4,14 +4,24 @@ import {
   SearchIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/outline";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 
 function Header() {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const items = useSelector((state) => state.basket.items);
+
   return (
     <header>
       {/* Top nav */}
       <div className="flex items-center bg-amazon_blue p-1 flex-grow py-2">
         {/* Logo */}
-        <div className="mt-2 flex items-center flex-grow sm:flex-grow-0">
+        <div
+          className="mt-2 flex items-center flex-grow sm:flex-grow-0"
+          onClick={() => router.push("/")}
+        >
           <Image
             src="https://rb.gy/ntumit"
             width={150}
@@ -27,13 +37,13 @@ function Header() {
             type="text"
             className="p-2 h-full w-6 flex-grow flex-shrink rounded-l-md focus:outline-none px-4"
           />
-          <SearchIcon className="h-12 p-4" />
+          <SearchIcon className="h-12 p-4 cursor-pointer" />
         </div>
 
         {/* Right */}
         <div className="text-white flex items-center text-xs space-x-6 mx-6 whitespace-nowrap">
-          <div className="link">
-            <p>Hello Sreenath</p>
+          <div className="link" onClick={!session ? signIn : signOut}>
+            <p>{session ? `Hello ${session.user.name} ` : "Sign In"}</p>
             <p className="font-extrabold md:text-sm">Account & lists</p>
           </div>
 
@@ -42,9 +52,12 @@ function Header() {
             <p className="font-extrabold md:text-sm">&Orders</p>
           </div>
 
-          <div className="relative link flex items-center">
+          <div
+            className="relative link flex items-center"
+            onClick={() => router.push("/checkout")}
+          >
             <span className="absolute top-0 left-7 h-4 w-4 bg-yellow-400 text-center rounded-full f text-black font-bold">
-              0
+              {items.length}
             </span>
             <ShoppingCartIcon className="h-10" />
             <p className="hidden md:inline-flex font-extrabold md:text-sm mt-2">
